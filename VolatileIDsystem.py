@@ -182,12 +182,15 @@ def menu():
     command = enter_input(f"{random_message}", int)
     if command == 1:
         os.system('cls') #Windows command to clear terminal
+        os.system('clear') #Linux command to clear terminal
         create()
     if command == 2:
         os.system('cls')
+        os.system('clear') 
         see()
     if command == 3:
         os.system('cls')
+        os.system('clear')
         enter_append()
     if command == 4:
         sys.exit() #(it is volatile)
