@@ -81,7 +81,7 @@ months = [f"{i:02}" for i in range(1, 13)] #Same method, but list is 01 to 12
 birth_dates = {}
 def check_bday(id): #Ensure the format and range of birthday are accurate
     birthday = enter_input("Please enter your date of birth (format example: 07-04-2006): ", str)
-    format = r"^\d{2}-\d{2}-\d{4}$" #2 ints, /, 2 ints, /, 4 ints
+    format = r"^\d{2}-\d{2}-\d{4}$" #2 ints, -, 2 ints, -, 4 ints
     check_format = re.match(format, birthday) #Ensure Input matches the expression format
     if check_format:
         day, month, year = map(int, birthday.split('-')) #Ints specified before forward slash will be vars day, month and year
