@@ -6,6 +6,44 @@ import time
 import random
 import re
 import os
+import csv
+
+
+def enter_csv(): #verify that the user has a file to do any of the csv operations
+   while True:
+    path = input("Please enter the directory to your csv file (remember to end it in .csv) E.g 'Documents/ID/IDsysdata.csv': ").strip() #Cant be enter_input as it uses the .lower() method (directory needs to be absolute)
+    if not os.path.exists(path):
+        print(f"Error: csv file not found at '{path}'")
+        continue
+    else: 
+        return path
+
+def load_data(path):
+    with open(path, 'r') as f: #Open file and give it a var name
+        reader = csv.reader(f) #var that reads file
+        try:
+            for row in reader: #begin writing all the content in the respective dictionaries
+                ip = int(row[0]) #uid is always in the first row
+                uid.append(ip)
+                names.update({ip:row[1]})
+                birth_dates.update({ip:row[2]})
+                home_countries.update({ip:row[3]})
+                sex.update({ip:row[4]}) 
+                occupation.update({ip:row[5]})
+                date_made.update({ip:row[6]})
+                if ip in recent_append:
+                    recent_append.update({ip:row[7]})
+        except(IndexError, ValueError) as e:
+            print("")
+
+def save_data(path):
+    with open(path, 'w') as f:
+        writer = csv.writer(f)
+        for id in uid: #Write all of the respective data that is currently held in the program through a loop of the uid list
+            if id in recent_append:
+                writer.writerow([id, names[id], birth_dates[id], home_countries[id], sex[id], occupation[id], date_made[id], recent_append[id]])
+            else:
+                writer.writerow([id, names[id], birth_dates[id], home_countries[id], sex[id], occupation[id], date_made[id]])
 
 def intro():
     print("\n")
@@ -36,19 +74,17 @@ def enter_input(text, type): #Text = What the input says   Type = What type the 
         except TypeError as TyErr:
             print(TyErr) #Same as value error except
 
-#Different input messages
-
 #Define the user info
 names = {} #Open to all names!
 days = [f"{i:02}" for i in range(1, 32)] #Creates a list of numbers 01 to 31
 months = [f"{i:02}" for i in range(1, 13)] #Same method, but list is 01 to 12
 birth_dates = {}
 def check_bday(id): #Ensure the format and range of birthday are accurate
-    birthday = enter_input("Please enter your date of birth (format example: 07/04/2006): ", str)
-    format = r"^\d{2}/\d{2}/\d{4}$" #2 ints, /, 2 ints, /, 4 ints
+    birthday = enter_input("Please enter your date of birth (format example: 07-04-2006): ", str)
+    format = r"^\d{2}-\d{2}-\d{4}$" #2 ints, /, 2 ints, /, 4 ints
     check_format = re.match(format, birthday) #Ensure Input matches the expression format
     if check_format:
-        day, month, year = map(int, birthday.split('/')) #Ints specified before forward slash will be vars day, month and year
+        day, month, year = map(int, birthday.split('-')) #Ints specified before forward slash will be vars day, month and year
         day_str = str(day).zfill(2) #if the day is not 2 digits a zero is put before it (same for month_str shown below)
         month_str = str(month).zfill(2)
         if day_str in days and month_str in months and year >= 1900 and year <= 2025:
@@ -91,8 +127,7 @@ def create(): #create info and assign it to dictionaries
         check_sex(nid)
         eo = enter_input("Please enter your current occupation: ", str)
         occupation.update({nid: eo})
-        id_creation_date = date.today()
-        date_made.update({nid:id_creation_date})
+        date_made.update({nid:date.today()})
         print(f"\nYour unique ID number to access this data is: {nid}\n\n")
         time.sleep(3)
         menu()
@@ -100,12 +135,9 @@ def create(): #create info and assign it to dictionaries
 def see(): #User can see their information through entering their unique ID number
     eid = enter_input("Please enter your unique ID number: ", int)
     if eid in uid:
-        print(f"name: {names[eid]}")
-        print(f"Date of birth: {birth_dates[eid]}")
-        print(f"Country of origin: {home_countries[eid]}")
-        print(f"Sex: {sex[eid]}")
-        print(f"Currenct occupation: {occupation[eid]}")
-        print(f"The date this information was put in: {date_made[eid]}")
+        print(f"name: {names[eid]}\nDate of birth: {birth_dates[eid]}\nCountry of origin: {home_countries[eid]}\nSex: {sex[eid]}\nCurrenct occupation: {occupation[eid]}")
+        if eid in date_made:
+            print(f"The date this information was put in: {date_made[eid]}")
         if eid in recent_append:
             print(f"Date of most recent modification: {recent_append[eid]}")
         time.sleep(5)
@@ -174,7 +206,7 @@ messages = ["Please enter your number: ", "What do you want: ", "Tell the ID man
 def menu():
     print("Please enter a number for what you would like to do")
     time.sleep(1)   
-    commands = "1: Create a new ID\n2: View your current ID\n3: Append your current ID\n4: Leave (WILL REMOVE ALL CURRENT DATA)\n\n"
+    commands = "1: Create a new ID\n2: View your current ID\n3: Append your current ID\n4: write all data to a csv file\n5: load data from a csv file\n6: leave\n\n"
     for i in commands:
         print(i, end='', flush = True)
         time.sleep(0.05)
@@ -193,9 +225,17 @@ def menu():
         os.system('clear')
         enter_append()
     if command == 4:
-        sys.exit() #(it is volatile)
+        os.system('cls')
+        os.system('clear')
+        save_data(enter_csv()) #User might want to save it to a different csv file
+    if command == 5:
+        os.system('cls')
+        os.system('clear')
+        load_data(enter_csv()) #User might want to load data from different csv files
+    if command == 6:
+        sys.exit() 
     else:
         print("Invalid Input")
         os.system('cls') 
-        menu()       
+        menu()
 menu()
